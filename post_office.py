@@ -1,18 +1,16 @@
-import glob
 import os
 import json
 import smtplib
 import ssl
-import decor
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
-@decor.measure_time
+
 def send_email():
-    """Collect all report files in the script folder and send an email to the list of recipients"""
+    """Get a report file from the script folder and send an email to the list of recipients"""
     with open('config.json') as config_file:
         data = json.load(config_file)
     server = data['smtp_server']
@@ -23,9 +21,10 @@ def send_email():
     body = data['email_body']
     recipients = data['email_recipients']
     file = data['report_name']
+    # To avoid sending an empty report
     if os.path.getsize(file) < 6000:
-        print("File is empty, email wasn't sent")
         raise FileNotFoundError
+
     context = ssl.create_default_context()
 
     # Create a multipart message and set headers
@@ -36,7 +35,6 @@ def send_email():
 
     # Add body to email
     message.attach(MIMEText(body, "plain"))
-
 
     with open(file, "rb") as attachment:
         # Add file as application/octet-stream
