@@ -1,2 +1,2 @@
 # ReportGenPy
-Collecting numerous TFX test results in a single csv-file
+Collecting numerous TFX test results in a single excel-file

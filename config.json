@@ -1,7 +1,8 @@
 {
   "path_to_test_results": "\\\\testresultrepo.csiqa.local\\TestResults\\CI\\V8\\FOUNDATION\\*",
   "path_debug": "\\\\w10x64-29\\Test Results\\CI\\V8\\Foundation\\*",
-  "report_name": "Report.xlsx",
+  "report_name": "CI_Report",
+  "report_extension": "xlsx",
   "datetime_format": "%#m_%d_%Y",
   "table_header": ["CI Group","Feature","DB type","Browser","Build","Time","Total","Passed","Failed","Skipped","Result", "Scenario","Failed step","Error message"],
   "delimiter": ",",

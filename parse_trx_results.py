@@ -3,18 +3,31 @@ import os
 import json
 import pandas
 import xml.etree.ElementTree as elTree
-import re
 import functools
-import post_office
+import smtplib
+import ssl
+import logging
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from datetime import datetime, timedelta, date
 
+
+logging.basicConfig(level=logging.INFO,
+                    filename='app.log',
+                    filemode='w',
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%d-%m-%y %H:%M:%S')
 
 with open('config.json') as config_file:
     data = json.load(config_file)
 PATH = data['path_to_test_results']
 #PATH = data['path_debug']
 DATETIME_FORMAT = data['datetime_format']
-REPORT_NAME = data['report_name']
+REPORT_FILE = '{}_{}.{}'.format(data['report_name'],
+                                datetime.today().strftime(DATETIME_FORMAT),
+                                data['report_extension'])
 
 
 def measure_time(foo):
@@ -30,19 +43,17 @@ def measure_time(foo):
 
 
 def get_daily_folders_list() -> list:
-    """There are folders for each module,
-    and there are daily folders in each module folder.
-    Get a newest daily folder for each module.
-    """
+    """Get a newest daily folder for each module"""
     daily_folders = []
     # Get the newest folder
     for folder in glob.glob(PATH):
         new_results = os.path.join(folder, datetime.today().strftime(DATETIME_FORMAT))
         i = 1
+        # If there are no folders for the last three days - break
         while i != 3:
             if os.path.exists(new_results) and os.listdir(new_results):
                 daily_folders.append(new_results)
-                print('Folder found: ' + new_results)
+                logging.info('Results folder found: ' + new_results)
                 break
             day_before = datetime.today() - timedelta(days=i)
             new_results = os.path.join(folder, day_before.strftime(DATETIME_FORMAT))
@@ -52,6 +63,7 @@ def get_daily_folders_list() -> list:
 
 def read_error(file: str) -> list:
     """Open TRX file and read error messages"""
+    logging.debug('Reading the TRX file with errors')
     tree = elTree.parse(file)
     root = tree.getroot()
     results = root.find('{http://microsoft.com/schemas/VisualStudio/TeamTest/2010}Results')
@@ -71,19 +83,10 @@ def read_error(file: str) -> list:
                             for i in range(2, 40):
                                 # Scenarios always start with Gherkin keywords
                                 if step_with_error.startswith(('Given', 'When', 'Then', 'And')):
+                                    logging.debug('Step with error: {}'.format(step_with_error))
                                     break
                                 step_with_error = error_list[line - i]
-                            #return [extract_scenario_num(test_name), step_with_error, error_list[line]]
                             return [test_name, step_with_error, error_list[line]]
-
-
-def extract_scenario_num(text: str) -> str:
-    """Get only scenario number without long name"""
-    match = re.search(r'\d\d*_*\d\d*_*\d\d*_?\d*\d*', text)
-    if match:
-        return match.group().split('_')[-1]
-    else:
-        return text
 
 
 def parse(path_to_folder: str) -> list:
@@ -92,6 +95,7 @@ def parse(path_to_folder: str) -> list:
     for file in [item for item in glob.glob(path_to_folder, recursive=True)]:
         file_name = file.split('\\')[-2:]
         ff_info = [item.replace('.trx', '') for item in file_name[1].split('_')]
+
         # Parts of feature info
         group = file_name[0].replace('CLTQACLIENT', '')
         ff_name = '_'.join(ff_info[:-5])
@@ -107,19 +111,24 @@ def parse(path_to_folder: str) -> list:
         skipped = results[-1]
         error_message = ['-', '-', '-']
         result = 'PASSED'
+
         if int(failed):
             error_message = read_error(file)
             result = 'FAILED'
+
         feature = [*[group, ff_name, database, browser, build, timing, total,
                    passed, failed, skipped, result], *error_message]
         result_list.append(feature)
+        logging.debug('Get feature info: {}'.format(feature))
+    logging.info('Parsing files in folder: {} finished'.format(path_to_folder))
     return result_list
 
 
 @measure_time
 def create_reports():
     """Write a report for each folder with rest results"""
-    writer = pandas.ExcelWriter(REPORT_NAME, engine='xlsxwriter')
+    writer = pandas.ExcelWriter(REPORT_FILE, engine='xlsxwriter')
+    logging.info('Report file creation started')
     workbook = writer.book
 
     # Format 'Result' cells for passed and failed tests
@@ -159,7 +168,49 @@ def create_reports():
             worksheet.write(0, col_num + 1, value, header_format)
 
     writer.save()
+    logging.info('Report file created succesfully')
+
+
+@measure_time
+def send_email(file=REPORT_FILE):
+    """Get a report file from the script folder and send an email to the list of recipients"""
+    server = data['smtp_server']
+    port = data['smtp_port']
+    login = data['email_sender']
+    password = data['email_password']
+    subject = data['email_subject']
+    body = data['email_body']
+    recipients = data['email_recipients']
+    # To avoid sending an empty report
+    if os.path.getsize(file) < 6000:
+        logging.warning('Report file is empty, email not sent')
+        raise FileNotFoundError
+
+    context = ssl.create_default_context()
+
+    # Create a multipart message and set headers
+    message = MIMEMultipart()
+    message["From"] = login
+    message["To"] = ','.join(recipients)
+    message["Subject"] = subject
+
+    # Add body to email
+    message.attach(MIMEText(body, "plain"))
+
+    with open(file, "rb") as attachment:
+        # Add file as application/octet-stream
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment; filename="%s"'
+                        % os.path.basename(file))
+        message.attach(part)
+
+    with smtplib.SMTP_SSL(server, port, context=context) as server:
+        server.login(login, password)
+        server.sendmail(from_addr=login, to_addrs=recipients, msg=message.as_string())
+    logging.info("Email sent succesfully\n")
 
 
 create_reports()
-post_office.send_email()
+send_email()
