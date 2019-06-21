@@ -7,6 +7,7 @@ import functools
 import smtplib
 import ssl
 import logging
+import time
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -34,11 +35,9 @@ def measure_time(foo):
     """Decorator for time measuring"""
     @functools.wraps(foo)
     def wrapper(*args, **kwargs):
-        start_time = datetime.now().time()
+        start_time = time.time()
         foo(*args, **kwargs)
-        finish_time = datetime.now().time()
-        diff = datetime.combine(date.min, finish_time) - datetime.combine(date.min, start_time)
-        print("|{}| time: {}".format(foo.__name__, diff))
+        print("|%s| time: %1.1f sec" % (foo.__name__, time.time() - start_time))
     return wrapper
 
 
@@ -214,3 +213,4 @@ def send_email(file=REPORT_FILE):
 
 create_reports()
 send_email()
+
