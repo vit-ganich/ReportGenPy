@@ -4,6 +4,8 @@
   "report_name": "CI_Report",
   "report_extension": "xlsx",
   "datetime_format": "%#m_%d_%Y",
+  "log_file": "app.log",
+  "log_level": "DEBUG",
   "table_header": ["CI Group","Feature","DB type","Browser","Build","Time","Total","Passed","Failed","Skipped","Result", "Scenario","Failed step","Error message"],
   "delimiter": ",",
   "header_format": {
