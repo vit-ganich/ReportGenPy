@@ -43,12 +43,12 @@ def create_reports():
         file_name = '{}_{}'.format(rep_date, theme)
         header = cfg.TABLE_HEADER
 
-        data_frame = pandas.DataFrame(columns=header)
-
         tests_results = iterate_through_files_in_folder_and_parse_content(path)
 
+        data_frame = pandas.DataFrame(columns=header)
         data_frame = data_frame.append(pandas.DataFrame(tests_results, columns=header), ignore_index=True)
         data_frame.to_excel(writer, sheet_name=file_name)
+
         worksheet = writer.sheets[file_name]
 
         # Format failed cells
@@ -70,21 +70,20 @@ def create_reports():
 
 
 def get_daily_folders_list() -> list:
-    """Get a newest daily folder for each module"""
     daily_folders = []
-    # Get the newest folder
     for folder in glob.glob(cfg.PATH):
         new_results = os.path.join(folder, datetime.today().strftime(cfg.DATETIME_FORMAT))
-        i = 1
+        days_from_now = 1
         # If there are no folders for the last three days - break
-        while i != 3:
+        while days_from_now != 3:
             if os.path.exists(new_results) and os.listdir(new_results):
                 daily_folders.append(new_results)
-                logger().info('Results folder found: ' + new_results)
+                logger.info('Results folder found: ' + new_results)
                 break
-            day_before = datetime.today() - timedelta(days=i)
+            day_before = datetime.today() - timedelta(days=days_from_now)
             new_results = os.path.join(folder, day_before.strftime(cfg.DATETIME_FORMAT))
-            i += 1
+            days_from_now += 1
+
     return daily_folders
 
 
@@ -120,6 +119,7 @@ def iterate_through_files_in_folder_and_parse_content(path_to_folder: str) -> li
         result_list.append(feature)
         logger.debug('Get feature info: {}'.format(feature))
     logger.info('Parsing files in folder: {} finished'.format(path_to_folder))
+
     return result_list
 
 
