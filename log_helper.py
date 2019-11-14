@@ -4,7 +4,7 @@ import config_reader as cfg
 
 def init_logger():
     log = logging.getLogger('logger')
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.INFO)
 
     file_handler = logging.FileHandler(cfg.LOG_FILE, encoding='utf-8')
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')

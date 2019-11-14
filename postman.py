@@ -33,8 +33,8 @@ def create_email_body():
     try:
         for item in parser.brief_summary:
            message.append(summary_pattern.format(item[0], item[1], item[2], item[3], item[4]))
-    except:
-        logger.warning("Can't create brief summary")
+    except Exception as e:
+        logger.warning("Can't create brief summary: " + e.message)
     finally:
         return "".join(message) + email_footer
 
