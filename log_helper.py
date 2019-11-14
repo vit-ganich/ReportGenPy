@@ -6,7 +6,7 @@ def init_logger():
     log = logging.getLogger('logger')
     log.setLevel(logging.DEBUG)
 
-    file_handler = logging.FileHandler(cfg.LOG_FILE)
+    file_handler = logging.FileHandler(cfg.LOG_FILE, encoding='utf-8')
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     file_handler.setFormatter(formatter)
 

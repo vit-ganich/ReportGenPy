@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{e62b6632-21c4-4d9f-8396-56f969532849}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>parse_trx_results.py</StartupFile>
+    <StartupFile>program.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -23,11 +23,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="config_reader.py" />
+    <Compile Include="decorators.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="log_helper.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="parse_trx_results.py" />
     <Compile Include="postman.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="program.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

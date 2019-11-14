@@ -3,25 +3,17 @@ import os
 import config_reader as cfg
 import pandas
 import xml.etree.ElementTree as elTree
-import functools
-import time
-import postman
+import decorators as dec
 from datetime import datetime, timedelta
 from log_helper import init_logger
 
 
 logger = init_logger()
 
-def measure_time(foo):
-    """Decorator for time measuring"""
-    @functools.wraps(foo)
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        foo(*args, **kwargs)
-        print("|%s| time: %1.1f sec" % (foo.__name__, time.time() - start_time))
-    return wrapper
+brief_summary = []
 
-@measure_time
+
+@dec.measure_time
 def create_reports():
     """Write a report for each folder with rest results"""
     writer = pandas.ExcelWriter(cfg.REPORT_FILE, engine='xlsxwriter')
@@ -89,8 +81,11 @@ def get_daily_folders_list() -> list:
 
 def iterate_through_files_in_folder_and_parse_content(path_to_folder: str) -> list:
     """Iterate through the files in specified folder"""
+    total_trx = 0
+    failed_trx = 0
     result_list = list()
     for file in [item for item in glob.glob(path_to_folder, recursive=True)]:
+        total_trx += 1
         file_name = file.split('\\')[-2:]
         ff_info = [item.replace('.trx', '') for item in file_name[1].split('_')]
 
@@ -113,12 +108,18 @@ def iterate_through_files_in_folder_and_parse_content(path_to_folder: str) -> li
         if int(failed):
             error_message = open_trx_read_error(file)
             result = 'FAILED'
+            failed_trx += 1
 
         feature = [*[group, ff_name, database, browser, build, timing, total,
                    passed, failed, skipped, result], *error_message]
         result_list.append(feature)
         logger.debug('Get feature info: {}'.format(feature))
     logger.info('Parsing files in folder: {} finished'.format(path_to_folder))
+
+    passed_trx = total_trx-failed_trx
+    passed_percent = round((passed_trx / total_trx), 2) * 100
+    theme = path_to_folder.split('\\')[-4]
+    brief_summary.append([theme, total_trx, total_trx-failed_trx, failed_trx, passed_percent])
 
     return result_list
 
@@ -150,5 +151,5 @@ def open_trx_read_error(file: str) -> list:
                             return [test_name, step_with_error, error_list[line]]
 
 
-create_reports()
-postman.send_email()
+if __name__ == "main":
+    pass
