@@ -10,4 +10,4 @@ logger.info("----------------Program started")
 parser.create_reports()
 postman.send_email()
 
-logger.info("----------------Program finished\n")
+logger.info("----------------Program finished")

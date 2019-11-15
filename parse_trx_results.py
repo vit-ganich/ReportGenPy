@@ -1,15 +1,15 @@
 import glob
 import os
-import config_reader as cfg
 import pandas
-import xml.etree.ElementTree as elTree
 import decorators as dec
+import message_helper as msg_helper
+import trx_helper
+import config_reader as cfg
 from datetime import datetime, timedelta
 from log_helper import init_logger
 
 
 logger = init_logger()
-
 brief_summary = []
 
 
@@ -84,71 +84,45 @@ def iterate_through_files_in_folder_and_parse_content(path_to_folder: str) -> li
     total_trx = 0
     failed_trx = 0
     result_list = list()
-    for file in [item for item in glob.glob(path_to_folder, recursive=True)]:
-        total_trx += 1
-        file_name = file.split('\\')[-2:]
-        ff_info = [item.replace('.trx', '') for item in file_name[1].split('_')]
+    try:
+        for file in [item for item in glob.glob(path_to_folder, recursive=True)]:
+            total_trx += 1
+            file_name = file.split('\\')[-2:]
+            ff_info = [item.replace('.trx', '') for item in file_name[1].split('_')]
 
-        # Parts of feature info
-        group = file_name[0].replace('CLTQACLIENT', '')
-        ff_name = '_'.join(ff_info[:-5])
-        database = ff_info[-3]
-        browser = ff_info[-2]
-        tail = ff_info[-1].split('-')
-        build = tail[0]
-        results = tail[1:]
-        timing = results[0]
-        total = results[-4]
-        passed = results[-3]
-        failed = results[-2]
-        skipped = results[-1]
-        error_message = ['-', '-', '-']
-        result = 'PASSED'
+            # Parts of feature info
+            group = file_name[0].replace('CLTQACLIENT', '')
+            ff_name = '_'.join(ff_info[:-5])
+            database = ff_info[-3]
+            browser = ff_info[-2]
+            tail = ff_info[-1].split('-')
+            build = tail[0]
+            results = tail[1:]
+            timing = results[0]
+            total = results[-4]
+            passed = results[-3]
+            failed = results[-2]
+            skipped = results[-1]
+            error_message = ['-', '-', '-']
+            result = 'PASSED'
 
-        if int(failed):
-            error_message = open_trx_read_error(file)
-            result = 'FAILED'
-            failed_trx += 1
+            if int(failed):
+                error_message = trx_helper.open_trx_read_error(file)
+                result = 'FAILED'
+                failed_trx += 1
 
-        feature = [*[group, ff_name, database, browser, build, timing, total,
-                   passed, failed, skipped, result], *error_message]
-        result_list.append(feature)
-        logger.debug('Get feature info: {}'.format(feature))
-    logger.info('Parsing files in folder: {} finished'.format(path_to_folder))
+            feature = [*[group, ff_name, database, browser, build, timing, total,
+                       passed, failed, skipped, result], *error_message]
+            result_list.append(feature)
+            logger.debug('Get feature info: {}'.format(feature))
+        logger.info('Parsing files in folder: {} finished'.format(path_to_folder))
 
-    passed_trx = total_trx-failed_trx
-    passed_percent = round((passed_trx / total_trx), 2) * 100
-    theme = path_to_folder.split('\\')[-4]
-    brief_summary.append([theme, total_trx, total_trx-failed_trx, failed_trx, passed_percent])
+        msg_helper.create_brief_summary_for_theme(path_to_folder, total_trx, failed_trx)
 
-    return result_list
-
-
-def open_trx_read_error(file: str) -> list:
-    logger.debug('Reading the TRX file with errors')
-    tree = elTree.parse(file)
-    root = tree.getroot()
-    results = root.find('{http://microsoft.com/schemas/VisualStudio/TeamTest/2010}Results')
-
-    for unitTesResult in results:
-        if unitTesResult.attrib['outcome'] == 'Failed':
-            test_name = unitTesResult.attrib['testName']
-            for output in unitTesResult:
-                for errorInfo in output:
-                    error_list = [item for item in errorInfo.text.split('\n')]
-                    for line in range(len(error_list)):
-                        # Find an error in scenario output
-                        if '-> error:' in error_list[line]:
-                            # Step with error usually located at the previous line before error message
-                            step_with_error = error_list[line - 1]
-                            # But sometimes not the previous, so we search in upper lines
-                            for i in range(2, 40):
-                                # Scenarios always start with Gherkin keywords
-                                if step_with_error.startswith(('Given', 'When', 'Then', 'And')):
-                                    logger.debug('Step with error: {}'.format(step_with_error))
-                                    break
-                                step_with_error = error_list[line - i]
-                            return [test_name, step_with_error, error_list[line]]
+    except Exception as e:
+        logger.error(e)
+    finally:
+        return result_list
 
 
 if __name__ == "main":

@@ -2,8 +2,8 @@ import os
 import ssl
 import smtplib
 import config_reader as cfg
-import parse_trx_results as parser
 import decorators as dec
+import message_helper as msg_helper
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -13,50 +13,27 @@ from log_helper import init_logger
 
 logger = init_logger()
 
-summary_pattern = """------------ Theme: {}
-Total tests  count: {}
-Passed tests count: {}
-Failed tests count: {}
-Passed: {} %
-
-"""
-
-email_footer = """
-Python-generated email with the CI test results spreadsheet.
-If you want to unsubscribe, please, click |HERE| or just email to vhanich@elinext.com.
-"""
-
-email_subject = "Daily CI Report"
-
-def create_email_body():
-    message = []
-    try:
-        for item in parser.brief_summary:
-           message.append(summary_pattern.format(item[0], item[1], item[2], item[3], item[4]))
-    except Exception as e:
-        logger.warning("Can't create brief summary: " + e.message)
-    finally:
-        return "".join(message) + email_footer
-
 
 @dec.measure_time
 def send_email(file=cfg.REPORT_FILE):
     """Get a report file from the script folder and send an email to the list of recipients"""
+    logger.info("Start sending email")
+
+    check_file_is_empty(file)
+
     email_sender = cfg.data['email_sender']
     recipients = cfg.data['email_recipients']
 
-    check_file_is_empty(file)
     context = ssl.create_default_context()
 
     # Create a multipart message and set headers
     message = MIMEMultipart()
     message["From"] = email_sender
     message["To"] = ','.join(recipients)
-    message["Subject"] = email_subject
+    message["Subject"] = cfg.data['email_subject']
 
     # Add body to email
-    #message.attach(MIMEText(cfg.data['email_body'], "plain"))
-    message.attach(MIMEText(create_email_body(), "plain"))
+    message.attach(MIMEText(msg_helper.create_email_body(), "plain"))
 
     with open(file, "rb") as attachment:
         # Add file as application/octet-stream
