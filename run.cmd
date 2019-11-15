@@ -1,2 +1,2 @@
-cd C:\\GetCIResultsPy
+cd C:\\OtherProjects\\ReportGenPy
 python program.py
