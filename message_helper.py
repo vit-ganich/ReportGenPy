@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 import parse_trx_results as parser
+from datetime import datetime
 from log_helper import init_logger
 
 
@@ -14,7 +15,9 @@ Passed: {} %
 email_footer = """
 Python-generated email with the CI test results spreadsheet.
 If you want to unsubscribe, please, click |HERE| or just email to vhanich@elinext.com.
-"""
+
+Happy {} :-)
+""".format(datetime.today().strftime('%A'))
 
 
 logger = init_logger()
