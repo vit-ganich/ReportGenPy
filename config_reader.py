@@ -12,6 +12,7 @@ REPORT_FILE = '{}_{}.{}'.format(data['report_name'],
                                 datetime.today().strftime(DATETIME_FORMAT),
                                 data['report_extension'])
 LOG_FILE = data["log_file"]
+LOG_DEBUG = data['log_debug']
 HEADER_FORMAT = data["header_format"]
 TABLE_HEADER = data["table_header"]
 

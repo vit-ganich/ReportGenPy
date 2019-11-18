@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 import parse_trx_results as parser
+import config_reader as cfg
 from datetime import datetime
 from log_helper import init_logger
 
@@ -48,3 +49,14 @@ def create_email_body():
         logger.warning("Can't create brief summary: " + e)
     finally:
         return "".join(message) + email_footer
+
+
+def get_debug_info():
+    """Read log file from end to start and get info of the last run"""
+    data = []
+    with open(cfg.data['log_file'], 'r') as fread:
+        for line in reversed(list(fread)):
+            data.append(line.rstrip())
+            if "Program started" in line:
+                break
+    return "\n".join(data[::-1])

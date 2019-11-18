@@ -5,6 +5,7 @@
   "report_extension": "xlsx",
   "datetime_format": "%#m_%d_%Y",
   "log_file": "app.log",
+  "log_debug": "app_debug.log",
   "table_header": [ "CI Group", "Feature", "DB type", "Browser", "Build", "Time", "Total", "Passed", "Failed", "Skipped", "Result", "Scenario", "Failed step", "Error message" ],
   "delimiter": ",",
   "header_format": {
@@ -16,10 +17,13 @@
   },
   "smtp_server": "smtp.gmail.com",
   "smtp_port": 465,
-  "email_sender": "xxxx@gmail.com",
-  "email_password": "*******",
+  "email_sender": "***@gmail.com",
+  "email_password": "***",
   "email_subject": "Daily CI results",
   "email_recipients": [
-    "xxx@xxx.com"
+    "***@***.com"
+  ],
+  "email_recipients_debug": [
+    "***@***.com"
   ]
 }
