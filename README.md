@@ -1,4 +1,4 @@
-# trx-to-csv
+# TRX to Excel
 Collecting numerous TFX test results in a single excel-file<br>
 
 # Note:
