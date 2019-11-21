@@ -4,6 +4,7 @@ import config_reader as cfg
 import decorators as dec
 import message_helper as msg_helper
 import file_helper
+import os
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart

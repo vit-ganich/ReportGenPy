@@ -31,7 +31,7 @@ def create_brief_summary_for_theme(path_to_theme, total_trx, failed_trx):
 
         passed_trx = total_trx-failed_trx
         if total_trx:
-            passed_percent = round((passed_trx / total_trx), 2) * 100
+            passed_percent1 = "%.2f" % ((passed_trx / total_trx) * 100)
             parser.brief_summary.append([theme, total_trx, passed_trx, failed_trx, passed_percent])
         else:
             logger.warning("Found {} test results for theme {}. Summary wasn't created".format(total_trx, theme))
