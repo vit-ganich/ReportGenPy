@@ -1,6 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 import parse_trx_results as parser
 import config_reader as cfg
+import traceback
 from datetime import datetime
 from log_helper import init_logger
 
@@ -31,13 +32,13 @@ def create_brief_summary_for_theme(path_to_theme, total_trx, failed_trx):
 
         passed_trx = total_trx-failed_trx
         if total_trx:
-            passed_percent = round((passed_trx / total_trx), 2) * 100
+            passed_percent = "%.2f" % ((passed_trx / total_trx) * 100)
             parser.brief_summary.append([theme, total_trx, passed_trx, failed_trx, passed_percent])
         else:
             logger.warning("Found {} test results for theme {}. Summary wasn't created".format(total_trx, theme))
 
-    except Exception as e:
-        logger.error(e)
+    except Exception:
+        logger.error(traceback.format_exc())
 
 
 def create_email_body():
