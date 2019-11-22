@@ -1,0 +1,39 @@
+{
+  "path_to_test_results": "\\\\*****\\\\TestResults\\\\CI\\\\V8\\\\FOUNDATION\\\\*",
+  "path_debug": "\\\\w10x64-29\\Test Results\\CI\\V8\\Foundation\\*",
+  "report_name": "Report.xlsx",
+  "datetime_format": "%mm_%d_%Y",
+  "table_header": [
+    "CI Group",
+    "Feature",
+    "DB type",
+    "Browser",
+    "Build",
+    "Time",
+    "Total",
+    "Passed",
+    "Failed",
+    "Skipped",
+    "Result",
+    "Scenario",
+    "Failed step",
+    "Error message"
+  ],
+  "delimiter": ",",
+  "header_format": {
+    "bold": "True",
+    "text_wrap": "False",
+    "valign": "center",
+    "fg_color": "#D7E4BC",
+    "border": 1
+  },
+  "smtp_server": "smtp.gmail.com",
+  "smtp_port": 465,
+  "email_sender": "****",
+  "email_password": "****",
+  "email_subject": "Daily CI results",
+  "email_body": "This is an email with attachment sent from Python",
+  "email_recipients": [
+    "******"
+  ]
+}
