@@ -6,7 +6,7 @@ from datetime import datetime
 from log_helper import init_logger
 
 
-summary_pattern = """------------ Theme: {}
+summary_pattern_plain = """------------ Theme: {}
 Total tests  count: {}
 Passed tests count: {}
 Failed tests count: {}
@@ -14,10 +14,18 @@ Passed: {} %
 
 """
 
-email_footer = """
-Python-generated email with the CI test results spreadsheet.
-If you want to unsubscribe, please, click |HERE| or just email to vhanich@elinext.com.
-Happy {}!
+summary_pattern = """------------ Theme: <b>{}</b><br>
+Total tests  count: <b>{}</b><br>
+Passed tests count: <font color="green"><b>{}</b></font><br>
+Failed tests count: <font color="red"><b>{}</b></font><br>
+Passed: <b>{} %</b><br>
+<br>
+"""
+
+email_footer = """<br>
+<i>Python-generated email with the CI test results spreadsheet.</i><br>
+<i>If you want to unsubscribe, please, email to vhanich@elinext.com.</i><br>
+Happy {}!<br>
 """.format(datetime.today().strftime('%A'))
 
 
@@ -48,7 +56,9 @@ def create_email_body():
     except Exception as e:
         logger.warning("Can't create brief summary: " + e)
     finally:
-        return "".join(message) + email_footer
+        summary = "".join(message) + email_footer
+        logger.info(summary)
+        return summary
 
 
 def get_debug_info():

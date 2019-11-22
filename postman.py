@@ -33,13 +33,11 @@ def send_email(file=cfg.REPORT_FILE):
     context = ssl.create_default_context()
 
     # Create a multipart message and set headers
-    message = MIMEMultipart('related')
+    message = MIMEMultipart()
     message["From"] = email_sender
     message["To"] = ','.join(recipients)
     message["Subject"] = cfg.data['email_subject']
-
-    # Add body to email
-    message.attach(MIMEText(msg_helper.create_email_body(), "plain"))
+    message.preamble = 'CI results'
 
     with open(file, "rb") as attachment:
         # Add file as application/octet-stream
@@ -48,9 +46,12 @@ def send_email(file=cfg.REPORT_FILE):
         encoders.encode_base64(part)
         part.add_header('Content-Disposition', 'attachment; filename="{}"'.format(os.path.basename(file)))
         message.attach(part)
+    # Add body to email
 
-    attach_email_stats(message)
+    message.attach(MIMEText(msg_helper.create_email_body(), 'html'))
 
+    #embedded_images(message)
+    
     with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
         server.login(email_sender, email_passw)
         server.sendmail(from_addr=email_sender, to_addrs=recipients, msg=message.as_string())
@@ -63,7 +64,7 @@ def send_email_debug(error_msg):
     context = ssl.create_default_context()
 
     # Create a multipart message and set headers
-    message = MIMEMultipart('related')
+    message = MIMEMultipart()
     message["From"] = email_sender
     message["To"] = ','.join(recipients_debug)
     message["Subject"] = "Daily CI Debug"
@@ -76,25 +77,16 @@ def send_email_debug(error_msg):
         server.sendmail(from_addr=email_sender, to_addrs=recipients_debug, msg=message.as_string())
 
 
-def attach_email_stats(message):
-    # Create a multipart message and set headers
-    message.preamble = 'This is a multi-part message in MIME format.'
-
-    msgAlternative = MIMEMultipart('alternative')
-    message.attach(msgAlternative)
-    msgText = MIMEText('This is the alternative plain text message.')
-    msgAlternative.attach(msgText)
-
+def embedded_images(message):
     files = [file for file in glob.glob("*.png")]
-    msgText = MIMEText('Some <i>statistics</i></b> for the <b>CI runs</b>.<br><img src="cid:{}"><br><img src="cid:{}"><br>Generated with Pandas'.format(files[0], files[1]), 'html')
-    msgAlternative.attach(msgText)
-    
+    msgText = MIMEText('P.S. <i>Some statistics</i> <b>(DEMO)</b>.<br><img src="cid:{}"><br><img src="cid:{}"><br>Generated with Pandas'.format(files[0], files[1]), 'html')
+    message.attach(msgText)
+
     for file in files:
         with open(file, 'rb') as f:
             image = MIMEImage(f.read())
-
         image.add_header('Content-ID', '<{}>'.format(file))
         message.attach(image)
-
+    
 if __name__ == "main":
     pass
