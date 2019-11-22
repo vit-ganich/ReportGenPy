@@ -436,3 +436,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/horizon.png
+/classic.png

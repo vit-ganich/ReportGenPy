@@ -17,8 +17,7 @@ Passed: {} %
 email_footer = """
 Python-generated email with the CI test results spreadsheet.
 If you want to unsubscribe, please, click |HERE| or just email to vhanich@elinext.com.
-
-Happy {} :-)
+Happy {}!
 """.format(datetime.today().strftime('%A'))
 
 
