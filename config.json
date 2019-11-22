@@ -1,5 +1,5 @@
 {
-  "path_to_test_results": "\\\\testresultrepo.csiqa.local\\TestResults\\CI\\V8\\FOUNDATION\\*",
+  "path_to_test_results": "\\\\***\\TestResults\\CI\\**\\***\\*",
   "path_debug": "D:\\TestResults\\CI\\V8\\FOUNDATION*",
   "report_name": "C:\\CI_Reports\\CI_Report",
   "report_extension": "xlsx",
@@ -15,9 +15,9 @@
     "fg_color": "#D7E4BC",
     "border": 1
   },
-  "smtp_server": "smtp.gmail.com",
+  "smtp_server": "smtp.***.***",
   "smtp_port": 465,
-  "email_sender": "***@gmail.com",
+  "email_sender": "***@***.com",
   "email_password": "***",
   "email_subject": "Daily CI results",
   "email_recipients": [
