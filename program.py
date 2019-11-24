@@ -17,4 +17,3 @@ try:
     logger.info("----------------Program finished")
 except Exception:
     postman.send_email_debug(traceback.format_exc())
-    print(traceback.format_exc())
