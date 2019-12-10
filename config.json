@@ -3,6 +3,7 @@
   "path_debug": "D:\\TestResults\\CI\\V8\\FOUNDATION*",
   "report_name": "C:\\CI_Reports\\CI_Report",
   "report_extension": "xlsx",
+  "datetime_format": "%#m_%#d_%Y",
   "datetime_format": "%#m_%d_%Y",
   "log_file": "app.log",
   "log_debug": "app_debug.log",
