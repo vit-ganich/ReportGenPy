@@ -48,7 +48,8 @@ def send_email(file=cfg.REPORT_FILE):
         message.attach(part)
     # Add body to email
 
-    message.attach(MIMEText(msg_helper.create_email_body(), 'html'))
+    #message.attach(MIMEText(msg_helper.create_email_body(), 'html'))
+    message.attach(MIMEText(msg_helper.create_email_body(), 'plain'))
 
     #embedded_images(message)
     

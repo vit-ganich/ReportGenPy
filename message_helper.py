@@ -2,11 +2,12 @@
 import parse_trx_results as parser
 import config_reader as cfg
 import traceback
+import graphs
 from datetime import datetime
 from log_helper import init_logger
 
 
-summary_pattern_plain = """------------ Theme: {}
+summary_pattern = """------------ Theme: {}
 Total tests  count: {}
 Passed tests count: {}
 Failed tests count: {}
@@ -14,19 +15,29 @@ Passed: {} %
 
 """
 
-summary_pattern = """------------ Theme: <b>{}</b><br>
+summary_pattern_html = """------------ Theme: <b>{}</b><br>
 Total tests  count: <b>{}</b><br>
 Passed tests count: <font color="green"><b>{}</b></font><br>
 Failed tests count: <font color="red"><b>{}</b></font><br>
 Passed: <b>{} %</b><br>
-<br>
 """
 
-email_footer = """<br>
+email_footer = """
+Python-generated email with the CI test results spreadsheet.
+If you want to unsubscribe, please, email to vhanich@elinext.com.
+Happy {}!
+""".format(datetime.today().strftime('%A'))
+
+email_footer_html = """<br>
 <i>Python-generated email with the CI test results spreadsheet.</i><br>
 <i>If you want to unsubscribe, please, email to vhanich@elinext.com.</i><br>
 Happy {}!<br>
 """.format(datetime.today().strftime('%A'))
+
+email_runs_history = """
+P.S. Some additional statistics through CI runs (DEMO):
+{}
+"""
 
 
 logger = init_logger()
@@ -53,13 +64,21 @@ def create_email_body():
     try:
         for item in parser.brief_summary:
            message.append(summary_pattern.format(item[0], item[1], item[2], item[3], item[4]))
+           history = email_runs_history.format(create_runs_history())
     except Exception as e:
         logger.warning("Can't create brief summary: " + e)
     finally:
-        summary = "".join(message) + email_footer
+        summary = "".join(message) + email_footer + history
         logger.info(summary)
         return summary
 
+
+def create_runs_history():
+    history = []
+    for key, value in graphs.stats.items():
+       history.append(key)
+       history.append(value)
+    return "\n".join(history)
 
 def get_debug_info():
     """Read log file from end to start and get info of the last run"""

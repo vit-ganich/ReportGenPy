@@ -47,7 +47,7 @@ def create_stats_for_day(path_to_theme, total_trx, failed_trx):
         theme = splitted_path_to_file[-2].lower()
         raw_date = splitted_path_to_file[-1]
         datetime_obj = datetime.strptime(raw_date, '%m_%d_%Y')
-        date = datetime_obj.strftime('%d %b')
+        date = datetime_obj.strftime('%m %d %y')
         passed_trx = total_trx-failed_trx
         if total_trx:
             passed_percent = "%.2f" % ((passed_trx / total_trx) * 100)
