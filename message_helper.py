@@ -15,28 +15,34 @@ Passed: {} %
 
 """
 
-summary_pattern_html = """------------ Theme: <b>{}</b><br>
+summary_html_pattern = """------------ Theme: <b>{}</b><br>
 Total tests  count: <b>{}</b><br>
 Passed tests count: <font color="green"><b>{}</b></font><br>
 Failed tests count: <font color="red"><b>{}</b></font><br>
 Passed: <b>{} %</b><br>
 """
 
-email_footer = """
+email_footer_pattern = """
 Python-generated email with the CI test results spreadsheet.
 If you want to unsubscribe, please, email to vhanich@elinext.com.
 Happy {}!
 """.format(datetime.today().strftime('%A'))
 
-email_footer_html = """<br>
+email_footer_html_pattern = """<br>
 <i>Python-generated email with the CI test results spreadsheet.</i><br>
 <i>If you want to unsubscribe, please, email to vhanich@elinext.com.</i><br>
 Happy {}!<br>
-""".format(datetime.today().strftime('%A'))
+"""
 
-email_runs_history = """
-P.S. Some additional statistics through CI runs (DEMO):
+email_runs_history_pattern = """
+(DEMO) Statistics through the CI runs:
+
 {}
+"""
+
+email_runs_history_html_pattern = """<br>
+<i>(DEMO) Statistics through the CI runs:</i><br>
+{}<br>
 """
 
 
@@ -63,21 +69,25 @@ def create_email_body():
     message = []
     try:
         for item in parser.brief_summary:
-           message.append(summary_pattern.format(item[0], item[1], item[2], item[3], item[4]))
-           history = email_runs_history.format(create_runs_history())
+           message.append(summary_html_pattern.format(item[0], item[1], item[2], item[3], item[4]))
+        
+        history = email_runs_history_html_pattern.format(create_runs_history())
+        footer = email_footer_html_pattern.format(datetime.today().strftime('%A'))
+
     except Exception as e:
         logger.warning("Can't create brief summary: " + e)
     finally:
-        summary = "".join(message) + email_footer + history
-        logger.info(summary)
-        return summary
+        bonus_info = "".join(message) + history + footer
+        logger.info(bonus_info)
+        return bonus_info
 
 
 def create_runs_history():
     history = []
     for key, value in graphs.stats.items():
-       history.append(key)
+       history.append(key.capitalize())
        history.append(value)
+
     return "\n".join(history)
 
 def get_debug_info():

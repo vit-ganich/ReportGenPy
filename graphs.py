@@ -1,6 +1,6 @@
 ﻿import matplotlib.pyplot as plt
 import pandas as pd
-import statis
+import stats
 from collections import OrderedDict
 import decorators as dec
 import postman
@@ -8,7 +8,7 @@ import postman
 stats = {}
 
 @dec.measure_time
-def do_magic(data):
+def create_magic_graphs(data):
     for theme_key in data.keys():
         data_set = {'date':[], 'total trx':[], 'passed trx':[], "passed %":[]}
         data_theme = data[theme_key]
@@ -24,7 +24,8 @@ def do_magic(data):
             data_set['passed %'].append(float(perc))
     
         data_frame = pd.DataFrame(data_set)
-        stats[theme_key] = data_frame.to_string(index = False)
+        stats[theme_key] = data_frame.to_html(index = False, border='1')
+
         plt.clf()
         plt.figure(figsize=(8,6), frameon=False)
         plt.title(theme_key)

@@ -13,14 +13,11 @@ final_set = {'classic':{}, 'horizon':{}}
 
 
 def get_stats_for_all_time() -> dict: 
-
-    list = [folder for folder in glob.glob(cfg.PATH + "\\*", recursive=True)]
-    for folder in list:
+    days_folders = [folder for folder in glob.glob(cfg.PATH + "\\*", recursive=True)]
+    for folder in days_folders:
         iterate_through_files_in_folder_and_parse_content(folder)
 
-    data = json.dumps(final_set,sort_keys=True, indent=4)
-    with open("statistics.json", 'w') as file:
-        file.write(data)
+    save_stats_to_json()
 
     return final_set
 
@@ -42,7 +39,6 @@ def iterate_through_files_in_folder_and_parse_content(path_to_folder: str) -> li
     create_stats_for_day(path_to_folder, total_trx, failed_trx)
 
 def create_stats_for_day(path_to_theme, total_trx, failed_trx):
-
         splitted_path_to_file = path_to_theme.split('\\')
         theme = splitted_path_to_file[-2].lower()
         raw_date = splitted_path_to_file[-1]
@@ -55,6 +51,12 @@ def create_stats_for_day(path_to_theme, total_trx, failed_trx):
         else:
             logger.warning("Found {} test results for theme {}. Summary wasn't created".format(total_trx, theme))
 
+
+def save_stats_to_json(file_name="statistics.json"):
+    data = json.dumps(final_set,sort_keys=True, indent=4)
+    with open(file_name, 'w') as file:
+        file.write(data)
+    
 
 if __name__ == "main":
     pass

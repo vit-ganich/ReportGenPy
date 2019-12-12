@@ -39,20 +39,13 @@ def send_email(file=cfg.REPORT_FILE):
     message["Subject"] = cfg.data['email_subject']
     message.preamble = 'CI results'
 
-    with open(file, "rb") as attachment:
-        # Add file as application/octet-stream
-        part = MIMEBase("application", "octet-stream")
-        part.set_payload(attachment.read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition', 'attachment; filename="{}"'.format(os.path.basename(file)))
-        message.attach(part)
+    add_attachments(message, report_file=cfg.REPORT_FILE, stats_graps=True)
+    #attach_embedded_stats_graphs(message)
+
     # Add body to email
+    email_body = msg_helper.create_email_body()
+    message.attach(MIMEText(email_body, 'html'))
 
-    #message.attach(MIMEText(msg_helper.create_email_body(), 'html'))
-    message.attach(MIMEText(msg_helper.create_email_body(), 'plain'))
-
-    #embedded_images(message)
-    
     with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
         server.login(email_sender, email_passw)
         server.sendmail(from_addr=email_sender, to_addrs=recipients, msg=message.as_string())
@@ -60,6 +53,7 @@ def send_email(file=cfg.REPORT_FILE):
 
 
 def send_email_debug(error_msg):
+    """Send notification in case of something got wrong"""
     debug_message = "CI report wasn't sent - see the log below:\n{}\n{}".format(msg_helper.get_debug_info(), error_msg)
 
     context = ssl.create_default_context()
@@ -78,9 +72,27 @@ def send_email_debug(error_msg):
         server.sendmail(from_addr=email_sender, to_addrs=recipients_debug, msg=message.as_string())
 
 
-def embedded_images(message):
+def add_attachments(message, report_file=cfg.REPORT_FILE, stats_graps=False):
+    attachs_list = [report_file]
+
+    if stats_graps:
+        for graph in glob.glob("*.png"):
+            attachs_list.append(graph)
+
+    for file in attachs_list:
+        with open(file, "rb") as attachment:
+            # Add file as application/octet-stream
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+            encoders.encode_base64(part)
+            part.add_header('Content-Disposition', 'attachment; filename="{}"'.format(os.path.basename(file)))
+            message.attach(part)
+
+
+def attach_embedded_stats_graphs(message):
+    """Insert images to email body"""
     files = [file for file in glob.glob("*.png")]
-    msgText = MIMEText('P.S. <i>Some statistics</i> <b>(DEMO)</b>.<br><img src="cid:{}"><br><img src="cid:{}"><br>Generated with Pandas'.format(files[0], files[1]), 'html')
+    msgText = MIMEText('<br><img src="cid:{}"><br><img src="cid:{}">'.format(files[0], files[1]), 'html')
     message.attach(msgText)
 
     for file in files:
@@ -88,6 +100,7 @@ def embedded_images(message):
             image = MIMEImage(f.read())
         image.add_header('Content-ID', '<{}>'.format(file))
         message.attach(image)
-    
+
+
 if __name__ == "main":
     pass
