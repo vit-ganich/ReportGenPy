@@ -438,3 +438,7 @@ ASALocalRun/
 .mfractor/
 /horizon.png
 /classic.png
+
+# Custon JSON files
+statistics.json
+config.json
