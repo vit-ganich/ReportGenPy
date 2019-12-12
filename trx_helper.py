@@ -30,3 +30,7 @@ def open_trx_read_error(file: str) -> list:
                                     break
                                 step_with_error = error_list[line - i]
                             return [test_name, step_with_error, error_list[line]]
+
+
+if __name__ == "main":
+    pass

@@ -7,7 +7,12 @@ from datetime import datetime
 from log_helper import init_logger
 
 
-summary_pattern = """------------ Theme: {}
+"""
+Message patterns
+"""
+
+summary_pattern = """Test run summary
+------------ Theme: {}
 Total tests  count: {}
 Passed tests count: {}
 Failed tests count: {}
@@ -29,19 +34,20 @@ Happy {}!
 """.format(datetime.today().strftime('%A'))
 
 email_footer_html_pattern = """<br>
-<i>Python-generated email with the CI test results spreadsheet.</i><br>
+Python-generated email with the CI test results spreadsheet.<br>
 <i>If you want to unsubscribe, please, email to vhanich@elinext.com.</i><br>
 Happy {}!<br>
 """
 
 email_runs_history_pattern = """
-(DEMO) Statistics through the CI runs:
+History (see graphs in the attachments):
 
 {}
 """
 
-email_runs_history_html_pattern = """<br>
-<i>(DEMO) Statistics through the CI runs:</i><br>
+email_runs_history_html_pattern = """------------<br>
+<b>CI runs history</b> <i>(see graphs in the attachments):</i><br>
+<br>
 {}<br>
 """
 
@@ -90,6 +96,7 @@ def create_runs_history():
 
     return "\n".join(history)
 
+
 def get_debug_info():
     """Read log file from end to start and get info of the last run"""
     data = []
@@ -99,3 +106,7 @@ def get_debug_info():
             if "Program started" in line:
                 break
     return "\n".join(data[::-1])
+
+
+if __name__ == "main":
+    pass
