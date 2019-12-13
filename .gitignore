@@ -442,3 +442,5 @@ ASALocalRun/
 # Custon JSON files
 statistics.json
 config.json
+
+Output/
