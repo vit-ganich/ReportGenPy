@@ -1,10 +1,9 @@
 import glob
 import os
 import pandas
-import decorators as dec
 from Helpers.trx_helper import TrxHelper
 from stats import Stats
-from Helpers import config_reader as cfg
+from Helpers import config_reader as cfg, decorators as dec
 from datetime import datetime, timedelta
 from Helpers.log_helper import init_logger
 from Helpers.file_helper import FileHelper

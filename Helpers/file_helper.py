@@ -37,6 +37,13 @@ class FileHelper:
         except FileNotFoundError:
             pass
 
+    @classmethod
+    def output_folder_exists(cls, folder='Output'):
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+            return False
+        return True
+
 
 if __name__ == "main":
     pass

@@ -1,6 +1,5 @@
 import ssl
 import smtplib
-import decorators as dec
 import os
 import glob
 from email import encoders
@@ -11,9 +10,7 @@ from email.mime.image import MIMEImage
 from Helpers.log_helper import init_logger
 from Helpers.message_helper import MessageHelper
 from Helpers.file_helper import FileHelper
-from Helpers import config_reader as cfg
-from parse_trx_results import TrxParser
-
+from Helpers import config_reader as cfg, decorators as dec
 
 logger = init_logger()
 

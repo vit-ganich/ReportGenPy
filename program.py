@@ -13,7 +13,10 @@ logger = init_logger()
 
 try:
     logger.info("----------------Program started")
-    FileHelper.clear_output_folder()
+
+    if FileHelper.output_folder_exists():
+        FileHelper.clear_output_folder()
+
     daily_folders = TrxParser.get_daily_folders_list(cfg.PATH)
 
     date = daily_folders[0].split('\\')[-1]
@@ -29,7 +32,7 @@ try:
     writer.save()
     Postman.send_email(report_file_to_send=report_file)
 
-    logger.info("----------------Program finished")
+    logger.info("----------------Program finished\n")
 except Exception:
     Postman.send_email_debug(traceback.format_exc())
     print(traceback.format_exc())

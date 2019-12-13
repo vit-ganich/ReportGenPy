@@ -1,7 +1,7 @@
 ﻿import matplotlib.pyplot as plt
 import pandas as pd
 from collections import OrderedDict
-import decorators as dec
+from Helpers import decorators as dec
 
 
 class Graphs:
