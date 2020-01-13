@@ -18,12 +18,17 @@ try:
         FileHelper.clear_output_folder()
 
     daily_folders = TrxParser.get_daily_folders_list(cfg.PATH)
-
+    if not daily_folders:
+        raise FileNotFoundError('New results not found')
     date = daily_folders[0].split('\\')[-1]
     report_file = '{}_{}.{}'.format(cfg.data['report_name'], date, cfg.data['report_extension'])
     writer = pandas.ExcelWriter(report_file, engine='xlsxwriter')
 
     for folder in daily_folders:
+        # This project is not ready so far
+        if 'INDUSTRY SOLUTIONS' in folder:
+            continue
+
         project = folder.split('\\')[-3]
         TrxParser.create_reports(folder, project, writer)
 

@@ -50,12 +50,12 @@ class TrxParser:
             worksheet = writer.sheets[sheet_name]
 
             # Format failed cells
-            worksheet.conditional_format('L1:L500', {'type': 'cell',
+            worksheet.conditional_format('B1:B500', {'type': 'cell',
                                                      'criteria': '==',
                                                      'value': '"FAILED"',
                                                      'format': format_red})
             # Format passed cells
-            worksheet.conditional_format('L1:L500', {'type': 'cell',
+            worksheet.conditional_format('B1:B500', {'type': 'cell',
                                                      'criteria': '==',
                                                      'value': '"PASSED"',
                                                      'format': format_green})
@@ -117,8 +117,8 @@ class TrxParser:
                     result = 'FAILED'
                     failed_trx += 1
 
-                feature = [*[group, ff_name, database, browser, build, timing, total,
-                             passed, failed, skipped, result], *error_message]
+                feature = [*[result, group, ff_name, database, browser, build, timing, total,
+                             passed, failed, skipped], *error_message]
 
                 result_list.append(feature)
                 logger.debug('Get feature info: {}'.format(feature))
