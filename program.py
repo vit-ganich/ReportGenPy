@@ -17,9 +17,11 @@ try:
     if FileHelper.output_folder_exists():
         FileHelper.clear_output_folder()
 
-    daily_folders = TrxParser.get_daily_folders_list(cfg.PATH)
+    daily_folders = TrxParser.get_daily_folders_list(cfg.PATH, day='1_17_2020')
+
     if not daily_folders:
         raise FileNotFoundError('New results not found')
+
     date = daily_folders[0].split('\\')[-1]
     report_file = '{}_{}.{}'.format(cfg.data['report_name'], date, cfg.data['report_extension'])
     writer = pandas.ExcelWriter(report_file, engine='xlsxwriter')
@@ -28,16 +30,18 @@ try:
         # This project is not ready so far
         if 'INDUSTRY SOLUTIONS' in folder:
             continue
-
         project = folder.split('\\')[-3]
         TrxParser.create_reports(folder, project, writer)
 
+    # Create graphs withs stats for all runs
     data = Stats.get_stats_for_all_time(cfg.PATH)
     Graphs.create_magic_graphs(data)
+
     writer.save()
+
     Postman.send_email(report_file_to_send=report_file)
 
     logger.info("----------------Program finished\n")
 except Exception:
-    Postman.send_email_debug(traceback.format_exc())
     print(traceback.format_exc())
+    Postman.send_email_debug(traceback.format_exc())

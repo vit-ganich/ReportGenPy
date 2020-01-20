@@ -66,23 +66,39 @@ class TrxParser:
         logger.info('Report file created successfully')
 
     @classmethod
-    def get_daily_folders_list(cls, path: str) -> list:
+    def get_daily_folders_list(cls, path: str, day='1_17_2020') -> list:
         daily_folders = []
         for folder in glob.glob(path + "\\*"):
-            new_results = os.path.join(folder, datetime.today().strftime(cfg.DATETIME_FORMAT))
-            days_from_now = 1
-            # If there are no folders for the last three days - break
-            while days_from_now != 3:
-                if FileHelper.folder_has_trx_files(new_results):
-                    daily_folders.append(new_results)
-                    logger.info('Results folder found: ' + new_results)
-                    break
-
-                day_before = datetime.today() - timedelta(days=days_from_now)
-                new_results = os.path.join(folder, day_before.strftime(cfg.DATETIME_FORMAT))
-                days_from_now += 1
+            if day:
+                folder = cls.get_folders_for_specified_day(folder, day)
+                if folder:
+                    daily_folders.append(folder)
+            else:
+                folder = cls.get_folders_of_previous_run(folder)
+                if folder:
+                    daily_folders.append(folder)
 
         return daily_folders
+
+    @classmethod
+    def get_folders_for_specified_day(cls, folder, day):
+        new_results = os.path.join(folder, day)
+        if FileHelper.folder_has_trx_files(new_results):
+            return new_results
+
+    @classmethod
+    def get_folders_of_previous_run(cls, folder: str, days_limit=3):
+        new_results = os.path.join(folder, datetime.today().strftime(cfg.DATETIME_FORMAT))
+        days_from_now = 1
+        # If there are no folders for the last three days - break
+        while days_from_now != days_limit:
+            if FileHelper.folder_has_trx_files(new_results):
+                logger.info('Results folder found: ' + new_results)
+                return new_results
+
+            day_before = datetime.today() - timedelta(days=days_from_now)
+            new_results = os.path.join(folder, day_before.strftime(cfg.DATETIME_FORMAT))
+            days_from_now += 1
 
     @classmethod
     def iterate_through_files_in_folder_and_parse_content(cls, path_to_folder: str) -> (list, int, int):
