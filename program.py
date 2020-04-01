@@ -17,7 +17,7 @@ try:
     if FileHelper.output_folder_exists():
         FileHelper.clear_output_folder()
 
-    daily_folders = TrxParser.get_daily_folders_list(cfg.PATH, day='1_17_2020')
+    daily_folders = TrxParser.get_daily_folders_list(cfg.PATH)
 
     if not daily_folders:
         raise FileNotFoundError('New results not found')
@@ -28,8 +28,8 @@ try:
 
     for folder in daily_folders:
         # This project is not ready so far
-        if 'INDUSTRY SOLUTIONS' in folder:
-            continue
+        # if 'INDUSTRY SOLUTIONS' in folder:
+        #     continue
         project = folder.split('\\')[-3]
         TrxParser.create_reports(folder, project, writer)
 

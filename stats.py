@@ -15,8 +15,8 @@ class Stats:
     def get_stats_for_all_time(cls, path) -> dict:
         days_folders = [folder for folder in glob.glob(path + '\\*\\*', recursive=True)]
         for folder in days_folders:
-            if 'INDUSTRY SOLUTIONS' in folder:
-                continue
+            # if 'INDUSTRY SOLUTIONS' in folder:
+            #     continue
             cls.iterate_through_files_in_folder_and_get_stats(folder)
 
         cls.save_stats_to_json()
