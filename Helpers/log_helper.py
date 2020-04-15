@@ -1,5 +1,5 @@
 import logging
-import config_reader as cfg
+from Helpers import config_reader as cfg
 
 
 def init_logger():

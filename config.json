@@ -3,10 +3,10 @@
   "path_debug": "D:\\TestResults\\CI\\V8\\FOUNDATION*",
   "report_name": "C:\\CI_Reports\\CI_Report",
   "report_extension": "xlsx",
-  "datetime_format": "%#m_%d_%Y",
+  "datetime_format": "%#m_%#d_%Y",
   "log_file": "app.log",
   "log_debug": "app_debug.log",
-  "table_header": [ "CI Group", "Feature", "DB type", "Browser", "Build", "Time", "Total", "Passed", "Failed", "Skipped", "Result", "Scenario", "Failed step", "Error message" ],
+  "table_header": [  "Result", "CI Group", "Feature", "DB type", "Browser", "Build", "Time", "Total", "Passed", "Failed", "Skipped", "Scenario", "Failed step", "Error message" ],
   "delimiter": ",",
   "header_format": {
     "bold": "True",
